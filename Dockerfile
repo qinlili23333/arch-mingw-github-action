@@ -5,8 +5,11 @@ LABEL maintainer="joshua@froggi.es"
 RUN echo -e '\n\n[multilib]\nInclude = /etc/pacman.d/mirrorlist\n\n' >> /etc/pacman.conf
 RUN pacman-key --init
 RUN pacman -Sy --needed --noconfirm archlinux-keyring
-RUN pacman -Syu --needed --noconfirm clang meson glslang git mingw-w64 wine libunwind base bash base-devel sed git tar curl wget bash gzip sudo file gawk grep bzip2 which pacman systemd findutils diffutils coreutils procps-ng util-linux xcb-util xcb-util-keysyms xcb-util-wm lib32-xcb-util lib32-xcb-util-keysyms glfw-x11
+RUN pacman -Syu --needed --noconfirm clang meson glslang git wine libunwind base bash base-devel sed git tar curl wget bash gzip sudo file gawk grep bzip2 which pacman systemd findutils diffutils coreutils procps-ng util-linux xcb-util xcb-util-keysyms xcb-util-wm lib32-xcb-util lib32-xcb-util-keysyms glfw-x11
 RUN git config --system --add safe.directory /github/workspace
+
+# manually install mingw with gcc132 from aur
+RUN sudo -u builduser bash -c 'export OLD_PWD=$PWD && cd ~ && git clone https://aur.archlinux.org/mingw-w64-gcc132.git && cd mingw-w64-gcc132 && makepkg -s --noconfirm && sudo pacman --noconfirm -U mingw-w64-gcc132* && cd $OLD_PWD'
 
 # create a builduser, as we cant run makepkg as root
 RUN useradd builduser -m
