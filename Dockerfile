@@ -8,8 +8,6 @@ RUN pacman -Sy --needed --noconfirm archlinux-keyring
 RUN pacman -Syu --needed --noconfirm clang meson glslang git wine libunwind base bash base-devel sed git tar curl wget bash gzip sudo file gawk grep bzip2 which pacman systemd findutils diffutils coreutils procps-ng util-linux xcb-util xcb-util-keysyms xcb-util-wm lib32-xcb-util lib32-xcb-util-keysyms glfw-x11
 RUN git config --system --add safe.directory /github/workspace
 
-# manually install mingw with gcc132 from aur
-RUN sudo -u builduser bash -c 'export OLD_PWD=$PWD && cd ~ && git clone https://aur.archlinux.org/mingw-w64-gcc132.git && cd mingw-w64-gcc132 && makepkg -s --noconfirm && sudo pacman --noconfirm -U mingw-w64-gcc132* && cd $OLD_PWD'
 
 # create a builduser, as we cant run makepkg as root
 RUN useradd builduser -m
@@ -17,6 +15,9 @@ RUN useradd builduser -m
 RUN passwd -d builduser
 # allow the builduser to use sudo without a password
 RUN printf 'builduser ALL=(ALL) ALL\n' | tee -a /etc/sudoers 
+
+# manually install mingw with gcc132 from aur
+RUN sudo -u builduser bash -c 'export OLD_PWD=$PWD && cd ~ && git clone https://aur.archlinux.org/mingw-w64-gcc132.git && cd mingw-w64-gcc132 && makepkg -s --noconfirm && sudo pacman --noconfirm -U mingw-w64-gcc132* && cd $OLD_PWD'
 
 # clone, build, then install the lib32-glfw-x11 AUR package (there is no lib32 glfw in the standard Arch repositories)
 RUN sudo -u builduser bash -c 'export OLD_PWD=$PWD && cd ~ && git clone https://aur.archlinux.org/lib32-glfw.git lib32-glfw-x11 && cd lib32-glfw-x11 && makepkg -s --noconfirm && sudo pacman --noconfirm -U lib32-glfw-x11* && cd $OLD_PWD'
