@@ -16,10 +16,8 @@ RUN passwd -d builduser
 # allow the builduser to use sudo without a password
 RUN printf 'builduser ALL=(ALL) ALL\n' | tee -a /etc/sudoers 
 
-# import gpg key for aur gcc132
-RUN gpg --keyserver hkps://keyserver.ubuntu.com --recv-key 6C35B99309B5FA62
 # manually install mingw with gcc132 from aur
-RUN sudo -u builduser bash -c 'export OLD_PWD=$PWD && cd ~ && git clone https://aur.archlinux.org/mingw-w64-gcc132.git mingw-w64-gcc132 && cd mingw-w64-gcc132 && makepkg -s --noconfirm && sudo pacman --noconfirm -U mingw-w64-gcc132* && cd $OLD_PWD'
+RUN sudo -u builduser bash -c 'export OLD_PWD=$PWD && cd ~ && gpg --keyserver hkps://keyserver.ubuntu.com --recv-key 6C35B99309B5FA62 && git clone https://aur.archlinux.org/mingw-w64-gcc132.git mingw-w64-gcc132 && cd mingw-w64-gcc132 && makepkg -s --noconfirm && sudo pacman --noconfirm -U mingw-w64-gcc132* && cd $OLD_PWD'
 
 # clone, build, then install the lib32-glfw-x11 AUR package (there is no lib32 glfw in the standard Arch repositories)
 RUN sudo -u builduser bash -c 'export OLD_PWD=$PWD && cd ~ && git clone https://aur.archlinux.org/lib32-glfw.git lib32-glfw-x11 && cd lib32-glfw-x11 && makepkg -s --noconfirm && sudo pacman --noconfirm -U lib32-glfw-x11* && cd $OLD_PWD'
